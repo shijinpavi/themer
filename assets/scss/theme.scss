@@ -1,0 +1,409 @@
+
+@mixin sass-themify-init($scheme-table){
+    @if $scheme-table == null{
+      @error "[sass-themify] sass-themify mixin needs a valid $scheme-table map defined"
+    } @else {
+      @if variable-exists("sass-themify-scheme-table") {
+        @warn "[sass-themify] sass-themify has already been initialized once. Initializing again will replace the previous initialized color scheme"
+      }
+      $sass-themify-scheme-table: $scheme-table !global;
+    }
+  }
+  
+  @mixin sass-themify($element:"body"){
+    //determine if global varaible has been declared or not
+    @if not variable-exists("sass-themify-theme-name") {
+      $sass-themify-theme-name: null !global;
+    }
+  
+    @each $theme-name, $color-map in $sass-themify-scheme-table{
+      $sass-themify-theme-name: $theme-name !global;
+      @if $theme-name != "default"{
+        #{$element}.#{$theme-name}{
+          @content;
+        }
+      } @else {
+        #{$element}{
+          @content;
+        }
+      }
+      $sass-themify-theme-name: null !global;
+    }
+  }
+  
+  @function sass-themify-get-map-deep($map, $keys...) {
+    @each $key in $keys {
+      $map: map-get($map, $key);
+    }
+    @return $map;
+  }
+  
+  
+  @function sass-themify-get-color($component){
+    @if $sass-themify-scheme-table == null {
+      @error "[sass-themify] You need to call sass-themify mixin to initialize a theme before you can call the sass-themify-get function.";
+    }
+    @if $sass-themify-theme-name == null {
+      @error "[sass-themify] sass-themify-get function can only be used within the scope of the 'sass-themify' mixin.";
+    }
+    @return sass-themify-get-map-deep($sass-themify-scheme-table,$sass-themify-theme-name,$component);
+  }
+  
+  @function sass-themify-get-theme-name(){
+    @return $sass-themify-theme-name;
+  }
+
+
+ 
+
+$theme-map: (
+  'default':(
+    'text-default':#383838,
+    'bg-primary':#5c5c5c,
+    'bg-secondary':#e3e3e3,
+    'text-dark':#1a1a1a,
+    'text-light':#ffffff,
+    'bg-light':rgba(255,255,255,0.2),
+    'img-filter':grayscale(1),
+  ),
+  'red':(
+    'text-default':#303030,
+    'bg-primary':#ff3334,
+    'bg-secondary':#aeaeae,
+    'text-dark':#000000,
+    'text-light':#eeeeee,
+    'text-white':#ffffff,
+    'bg-light':rgba(255,255,255,0.2),
+    'img-filter':grayscale(0),
+  ),
+  'blue':(
+    'text-default':#222222,
+    'bg-primary':#1993c6,
+    'bg-secondary':#dbedf9,
+    'text-dark':#000000,
+    'text-light':#eeeeee,
+    'text-white':#ffffff,
+    'bg-light':rgba(255,255,255,0.2),
+    'img-filter':grayscale(0),
+  ),
+  'green':(
+    'text-default':#444444,
+    'bg-primary':#01d449,
+    'bg-secondary':#f7f7f7,
+    'text-dark':#000000,
+    'text-light':#e3e3e3,
+    'text-white':#ffffff,
+    'bg-light':rgba(255,255,255,0.2),
+    'img-filter':grayscale(0),
+  )
+);
+
+
+//call initialize mixin with the theme-map variable
+@include sass-themify-init($theme-map);
+
+ 
+  //color related css goes under here within sass-themify mixin
+  @include sass-themify(){
+    #hero{
+        background: sass-themify-get-color("bg-primary");
+        a{
+            color: sass-themify-get-color("text-light") !important;
+        }
+        .btn-watch-video{
+            &:hover{
+                i{
+                    color: sass-themify-get-color("text-light") !important;
+                }
+            }
+        }
+    }
+    
+    a{
+      color: sass-themify-get-color("bg-primary") !important;
+      &:hover{
+        background: sass-themify-get-color("bg-primary") !important;
+        i{
+            color: sass-themify-get-color("text-light") !important;
+        }
+      }
+      
+    }
+
+    .btn-getstarted,.btn-get-started {
+        background-color: sass-themify-get-color("text-dark") !important;
+        color: sass-themify-get-color("text-light") !important;
+    }
+    #navmenu {
+       li{
+        &:hover a,&:focus,& .active{
+            color: sass-themify-get-color("text-white") !important ;
+        }
+        a{
+            color: sass-themify-get-color("text-light") !important;
+        }
+       }
+    }
+    
+  
+    .header {
+        padding: 5px 0;
+        background: sass-themify-get-color("bg-primary") !important;
+        border-bottom: 1px solid;
+        border-color: sass-themify-get-color("bg-light") !important;
+    }
+        
+    
+
+    @for $i from 1 through 6 {
+        section:not(.hero){
+            h#{7 - $i} {
+                color: sass-themify-get-color("text-dark");
+            }
+        }
+    }
+    
+     
+    .section-title {
+        h2 {
+            &:after {
+                background:sass-themify-get-color("bg-primary") !important; ;
+            }
+        }
+
+    }
+
+        .about {
+            .read-more 
+                    {
+                        color: sass-themify-get-color("bg-primary") !important;
+                        border-color: sass-themify-get-color("bg-primary") !important;;
+                    &:hover,
+                    &:focus {
+                        color: sass-themify-get-color("text-light") !important;
+                        background: sass-themify-get-color("bg-primary") !important;
+                    }
+                }
+            }
+            ul{
+                i{
+                    color: sass-themify-get-color("bg-primary") !important;
+                }
+            }
+        
+
+
+            .why-us {
+                .faq-container {
+                    .faq-item{
+                        h3 {
+                                
+                                color: sass-themify-get-color("text-dark") !important;
+                                & span{
+                                    color: sass-themify-get-color("bg-primary") !important;
+                                }
+                            
+                        }
+                    }
+                } 
+            }
+
+            img{
+                filter:sass-themify-get-color("img-filter") !important;
+            }
+
+    .call-to-action{
+        background-color: sass-themify-get-color("bg-primary") !important;
+       
+        &:before{
+            background-color: sass-themify-get-color("bg-primary") !important  ;
+            opacity: 0.8;
+        }
+        h3{
+            color:sass-themify-get-color("text-light") !important;
+        }
+        .cta-btn{
+            background-color: sass-themify-get-color("text-light") !important  ;
+            &:hover{
+                border-color: sass-themify-get-color("bg-primary") !important;
+            }
+        }
+    }
+
+    .skills {
+        .progress-bar{
+            background-color: sass-themify-get-color("bg-primary") !important;
+        }
+    }
+
+
+        .services {
+            .service-item {
+                .icon {
+                    i {color:sass-themify-get-color("bg-primary") !important;}
+                }
+            }
+            a{
+                color: sass-themify-get-color("text-dark") !important  
+            }
+        }
+
+
+
+.portfolio{
+    .portfolio-filters{
+        li{
+            &:hover,&.filter-active{
+                background-color: sass-themify-get-color("bg-primary") !important;
+            }
+        }
+    }
+}
+
+
+
+.pricing {
+    .buy-btn{
+        border-color: sass-themify-get-color("bg-primary") !important;
+        background-color: transparent;
+        &:hover{
+            background-color: sass-themify-get-color("bg-primary") !important;
+            color: sass-themify-get-color("text-light") !important;;
+        }
+    }
+    .featured{
+        border-color: sass-themify-get-color("bg-primary") !important;
+    }
+}
+
+
+.testimonials {
+    i{
+        color: sass-themify-get-color("bg-primary") !important;
+    }
+    .swiper-pagination-bullet-active{
+        background-color: sass-themify-get-color("bg-primary") !important;
+    }
+}
+
+    .faq-2{
+        .faq-active{
+            h3{
+                color: sass-themify-get-color("bg-primary") !important;
+            }
+        }
+        i{
+            color: sass-themify-get-color("bg-primary") !important;
+        }
+    }
+
+
+    .footer{
+        .footer-newsletter{
+            background-color: sass-themify-get-color("bg-primary") !important;
+            h4,p{
+                color: sass-themify-get-color("text-light") !important;
+            }
+            .newsletter-form{
+                background-color: sass-themify-get-color("text-light") !important;
+                input[type=submit]{
+                    background-color: sass-themify-get-color("text-dark") !important;
+                }
+            }
+        }
+        h4{
+            color: sass-themify-get-color("bg-primary") !important;
+        }
+        a{
+            color: sass-themify-get-color("text-dark") !important;
+            &:hover{
+                background: transparent !important;
+            }
+        }
+    } 
+    .scroll-top{
+        background: sass-themify-get-color("bg-primary") !important;
+    }
+
+  }
+
+
+
+  .theme-switch {
+    display: none;
+    position: fixed;
+    z-index: 2;
+    right: 15px;
+    bottom: 15px;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #1c1c1c;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    h5{
+        font-size: 12px;
+        font-weight: 300;
+        color: #fff;
+        margin: 0;
+    }
+    ul{
+        padding: 0;
+        margin: 0;
+    }
+    .caption{
+            width: 100%;
+            padding: 0 5px;
+    }
+}
+
+    .color-option {
+        height:20px;
+        width: 20px;
+        list-style: none;
+        border-radius: 4px;
+        margin: 10px;
+        transition: .2s;
+        cursor: pointer;
+        &:hover {
+          box-shadow: 0 0 0 5px rgba(0,0,0,.2);
+        }
+        &.is-selected {
+          transform: scale(1.1);
+          box-shadow: 0 0 0 5px rgba(0,0,0,.2);
+        }
+      }
+
+
+    .color-option:nth-child(1) { background: #dadada }
+    .color-option:nth-child(2) { background: #ff3334 }
+    .color-option:nth-child(3) { background: #1993c6 }
+    .color-option:nth-child(4) { background: #01d449 }
+
+    
+    .open-button{
+        background:#fff ;
+        border-radius: 0.4rem;
+        position: fixed;
+        z-index: 1;
+        right: 15px;
+        bottom: 15px;
+        outline: none;
+        border:none;
+        &:focus,&:hover,&:active{
+            background-color: #f5f5f5;
+            outline: none;
+            border:none
+        }
+    }
+    .cancel{
+        color:#fff !important;
+        outline: none;
+        border:none;
+        &:focus,&:hover,&:active{
+            outline: none;
+            border:none;
+            color: #f8f8f8;
+            background: transparent !important;
+        }
+    }
